@@ -14,12 +14,16 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-import { LoginFormData } from "./interface";
+import { LoginFormData, LoginResponse } from "./interface";
 import { hashPassword } from "@/components/utils/PasswordUtils";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/components/context/AuthContext";
 
 function LoginPage() {
+  const router = useRouter();
   const { register, handleSubmit } = useForm<LoginFormData>();
+  const { setIsAuthenticated, setAccessToken, setUser } = useAuth();
 
   const onSubmit = async (data: LoginFormData) => {
     const hashedData = {
@@ -40,16 +44,16 @@ function LoginPage() {
       }
     );
 
+    const resJson = (await response.json()) as LoginResponse;
+
     if (response.ok) {
-      toast({
-        title: "Success",
-        description: "Logged in successfully",
-      });
+      setIsAuthenticated(true);
+      setAccessToken(resJson.data!.token);
+      setUser(resJson.data!.user);
+      toast.success("Logged in successfully");
+      router.push("/");
     } else {
-      toast({
-        title: "Failed",
-        description: await response.json(),
-      });
+      toast.error("Failed to login", { description: resJson.error });
     }
   };
   return (

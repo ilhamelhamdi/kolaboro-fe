@@ -2,22 +2,22 @@ import { z } from "zod";
 
 export const signUpSchema = z
   .object({
-    displayName: z.string().min(1, { message: "Must not be blank" }),
-    username: z.string().min(1, { message: "Must not be blank" }),
+    displayName: z.string().min(1, { message: "Must not be empty" }),
+    username: z.string().min(1, { message: "Must not be empty" }),
 
     email: z
       .string()
       .min(1, {
-        message: "Must not be blank",
+        message: "Must not be empty",
       })
       .email({ message: "Invalid email address." }),
 
     password: z
       .string()
-      .min(8, { message: "Password must be at least 8 characters." }),
+      .min(1, { message: "Must not be empty" }),
 
-    passwordConfirmation: z.string().min(8, {
-      message: "Password confirmation must be at least 8 characters.",
+    passwordConfirmation: z.string().min(1, {
+      message: "Must not be empty",
     }),
   })
   .refine((data) => data.password === data.passwordConfirmation, {

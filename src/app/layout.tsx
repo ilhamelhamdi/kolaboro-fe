@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { Toaster } from "@/components/ui/toaster"
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
+import { AuthContextProvider } from "@/components/context/AuthContext";
+import { TooltipProvider } from "@radix-ui/react-tooltip";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -26,11 +28,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable}`}
-      >
-        {children}
-        <Toaster />
+      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <TooltipProvider>
+          <AuthContextProvider>
+            {children}
+            <Toaster />
+          </AuthContextProvider>
+        </TooltipProvider>
       </body>
     </html>
   );

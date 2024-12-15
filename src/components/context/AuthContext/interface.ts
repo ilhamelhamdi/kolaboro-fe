@@ -1,16 +1,23 @@
-export interface AuthContextInterface {
-  user: User
-  setUser: React.Dispatch<React.SetStateAction<User>>
-  isAuthenticated: boolean
-  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>
-  getUser: () => Promise<User | undefined>
+export interface User {
+  id: number;
+  email: string;
+  username: string;
+  display_name: string;
+  // avatar: string;
+  registered_at: string;
+  modified_at: string;
 }
 
-export interface User {
-  id: string
-  email: string
-  username: string
-  displayName: string
-  registeredAt: string
-  modifiedAt: string
+export interface AuthContextInterface {
+  user: User
+  setUser: (user: User) => void
+  isAuthenticated: boolean
+  setIsAuthenticated: (isAuthenticated: boolean) => void
+  getAccessToken: () => string
+  setAccessToken: (accessToken: string) => void
+  logout: () => void
+}
+
+export interface AuthContextProviderProps {
+  children: React.ReactNode
 }

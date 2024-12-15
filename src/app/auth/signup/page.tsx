@@ -16,9 +16,13 @@ import Link from "next/link";
 import { SignUpFormValues, signUpSchema } from "./form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useToast } from "@/hooks/use-toast";
+import { hashPassword } from "@/components/utils/PasswordUtils";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 function SignUpPage() {
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -27,14 +31,12 @@ function SignUpPage() {
     resolver: zodResolver(signUpSchema),
   });
 
-  const { toast } = useToast();
-
   const onSubmit = async (data: SignUpFormValues) => {
     const reqBody = {
       email: data.email,
       username: data.username,
       display_name: data.displayName,
-      password: data.password,
+      password: await hashPassword(data.password),
     };
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
@@ -49,16 +51,11 @@ function SignUpPage() {
     );
 
     if (response.ok) {
-      toast({
-        title: "Success",
-        description: "Account created successfully",
-      });
+      toast.success("Account created successfully");
+      router.push("/auth/login");
     } else {
-      
-      toast({
-        title: "Failed",
-        description: await response.json(),
-      });
+      const res = await response.json();
+      toast.error("Failed to create account", { description: res.error });
     }
   };
 
