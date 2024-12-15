@@ -137,9 +137,9 @@ function CanvasPage({ params }: CanvasPageProps) {
         <div className="max-w-screen-sm flex flex-col items-center gap-4 text-center">
           <h1 className="font-bold text-2xl">404 – Not found</h1>
           <p>
-            Whatever you were looking for at this address doesn't really live here anymore or never
-            lived here at all. Unless, of course, you came all the way here to see this message in
-            which case: "Hello, beautiful!"
+            Whatever you were looking for at this address doesn&apos;t really live here anymore or
+            never lived here at all. Unless, of course, you came all the way here to see this
+            message in which case: &quot;Hello, beautiful!&quot;
           </p>
           <Link href="/" className="button">
             <Button>Home</Button>

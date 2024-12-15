@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Editor, EditorState, RichUtils } from "draft-js";
+import { DraftEditorCommand, Editor, EditorState, RichUtils } from "draft-js";
 import "draft-js/dist/Draft.css"; // Import Draft.js default styles
 import { stateToHTML } from "draft-js-export-html";
 import { stateFromHTML } from "draft-js-import-html";
@@ -15,7 +15,7 @@ function RichEditor({ onHtmlChange, initialHtml = "" }: RichEditorProps) {
     EditorState.createWithContent(initialContentState)
   );
 
-  const handleKeyCommand = (command: any, editorState: any) => {
+  const handleKeyCommand = (command: DraftEditorCommand, editorState: EditorState) => {
     const newState = RichUtils.handleKeyCommand(editorState, command);
 
     if (newState) {

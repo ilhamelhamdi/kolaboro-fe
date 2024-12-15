@@ -3,7 +3,6 @@ import { BaseResponse } from "@/app/interface";
 import { useAuth } from "@/components/context/AuthContext";
 import ConfimationDialog from "@/components/elements/ConfirmationDialog";
 import Draggable from "@/components/elements/Draggable/index";
-import { Canvas } from "@/components/models/Canvas";
 import { Note, NoteRequest } from "@/components/models/Note";
 import { Card } from "@/components/ui/card";
 import {

@@ -1,6 +1,5 @@
 "use client";
 import { useAuth } from "@/components/context/AuthContext";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -24,7 +23,7 @@ export default function Home() {
       </div>
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start max-w-screen-md">
         <h1 className="font-semibold text-5xl text-center">
-          LET'S JOIN FOR COLLABORATING AND SHARING CREATIVE IDEAS IN REALTIME{" "}
+          LET&apos;S JOIN FOR COLLABORATING AND SHARING CREATIVE IDEAS IN REALTIME{" "}
         </h1>
 
         <div className="w-full flex gap-4 items-center flex-col sm:flex-row sm:justify-center">

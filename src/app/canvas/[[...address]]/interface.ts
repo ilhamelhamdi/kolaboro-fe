@@ -6,7 +6,7 @@ export interface CanvasPageProps {
   params: Promise<{ address: string[] }>
 }
 
-export interface GetCanvasResponse extends BaseResponse<Canvas> {}
+export type GetCanvasResponse = BaseResponse<Canvas>
 
 export interface BaseStreamMessage {
   topic: number;
@@ -17,9 +17,8 @@ export interface StreamMessage<T> extends BaseStreamMessage {
   message: T;
 }
 
-export interface RefreshCanvasMessage extends StreamMessage<Canvas> { }
-
-export interface RefreshNoteMessage extends StreamMessage<Note[]> { }
-export interface AddNoteMessage extends StreamMessage<Note> { }
-export interface EditNoteMessage extends StreamMessage<Note> { }
-export interface DeleteNoteMessage extends StreamMessage<NoteId> { }
+export type RefreshCanvasMessage = StreamMessage<Canvas>;
+export type RefreshNoteMessage = StreamMessage<Note[]>;
+export type AddNoteMessage = StreamMessage<Note>;
+export type EditNoteMessage = StreamMessage<Note>;
+export type DeleteNoteMessage = StreamMessage<NoteId>;
