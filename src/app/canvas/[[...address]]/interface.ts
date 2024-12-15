@@ -18,6 +18,7 @@ export interface StreamMessage<T> extends BaseStreamMessage {
 }
 
 export type RefreshCanvasMessage = StreamMessage<Canvas>;
+export type EditCanvasMessage = StreamMessage<Canvas>;
 export type RefreshNoteMessage = StreamMessage<Note[]>;
 export type AddNoteMessage = StreamMessage<Note>;
 export type EditNoteMessage = StreamMessage<Note>;

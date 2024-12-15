@@ -1,12 +1,12 @@
 export interface Canvas {
   address: string;
   background: string;
-  createdAt: string;
+  created_at: string;
   id: number;
   namespace: string;
   owner: Owner;
   title: string;
-  updatedAt: string;
+  updated_at: string;
 }
 
 export interface Owner {

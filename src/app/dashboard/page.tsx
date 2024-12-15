@@ -1,19 +1,22 @@
 "use client";
 
 import { useAuth } from "@/components/context/AuthContext";
-import { Card } from "@/components/ui/card";
-import Image from "next/image";
-import Link from "next/link";
 import React, { useEffect } from "react";
-import { GetCanvasesResponse } from "./interface";
+import { CanvasBackground, CreateCanvasRequest, GetCanvasesResponse } from "./interface";
 import { toast } from "sonner";
 import { Canvas } from "@/components/models/Canvas";
-import { AspectRatio } from "@radix-ui/react-aspect-ratio";
+import { useRouter } from "next/navigation";
+import { BaseResponse } from "../interface";
+import DashboardNavbar from "./DashboardNavbar";
+import CanvasCard from "./CanvasCard";
+import ConfimationDialog from "@/components/elements/ConfirmationDialog";
 
 function DashboardPage() {
   const [canvases, setCanvases] = React.useState<Canvas[]>([]);
 
-  const { getAccessToken } = useAuth();
+  const { getAccessToken, user, logout } = useAuth();
+
+  const router = useRouter();
 
   const getCanvases = async () => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/canvas`, {
@@ -25,14 +28,51 @@ function DashboardPage() {
       },
     });
 
+    if (!response.ok) {
+      if (response.status === 401) logout();
+      const resJson = (await response.json()) as BaseResponse<String>;
+      toast.error(resJson.message);
+      return;
+    }
     const resJson = (await response.json()) as GetCanvasesResponse;
+
+    setCanvases(resJson.data!);
+  };
+
+  const getRandomBackground = async () => {
+    const response = await fetch(`api/canvas-background/random`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const resJson = (await response.json()) as CanvasBackground;
+    return resJson;
+  };
+
+  const handleCreateCanvas = async () => {
+    const background = await getRandomBackground();
+    const reqBody: CreateCanvasRequest = {
+      title: "Untitled",
+      background: background.url,
+    };
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/canvas`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getAccessToken()}`,
+      },
+      body: JSON.stringify(reqBody),
+    });
+
+    const resJson = (await response.json()) as BaseResponse<Canvas>;
     if (!response.ok || resJson.status === "error") {
       toast.error(resJson.message);
       return;
     }
 
-    console.log(resJson.data);
-    setCanvases(resJson.data!);
+    setCanvases([...canvases, resJson.data!]);
+    router.push("/canvas/" + resJson.data!.address);
   };
 
   useEffect(() => {
@@ -40,34 +80,19 @@ function DashboardPage() {
   }, []);
 
   return (
-    <section className="container mx-auto py-4">
-      <h1 className="font-bold text-3xl">My Canvas</h1>
-      <div className="mt-4 flex">
-        {canvases.map((canvas) => (
-          <div key={canvas.id} className="w-1/4 p-2">
-            <Card>
-              <Link href={'/canvas/'+canvas.address}>
-                <div className="p-2">
-                  <AspectRatio ratio={16 / 9} className="overflow-hidden rounded-xl">
-                    <Image
-                      src={canvas.background}
-                      alt="something"
-                      width={400}
-                      height={400}
-                      className="w-full"
-                    />
-                  </AspectRatio>
-                </div>
-                <div className="p-2 pt-0 flex flex-col">
-                  <h2 className="text-lg font-semibold">{canvas.title}</h2>
-                  <p className="text-gray-500">{canvas.owner.displayName}</p>
-                </div>
-              </Link>
-            </Card>
-          </div>
-        ))}
-      </div>
-    </section>
+    <main className="w-screen min-h-screen">
+      <DashboardNavbar onCreateCanvas={handleCreateCanvas} />
+      <section className="container mx-auto py-4">
+        <h1 className="font-bold text-3xl">My Canvas</h1>
+        <div className="mt-4 flex flex-wrap">
+          {canvases.map((canvas) => (
+            <div key={canvas.id} className="w-1/2 md:w-1/3 lg:w-1/4 p-2">
+              <CanvasCard canvas={canvas} refreshCanvases={getCanvases} />
+            </div>
+          ))}
+        </div>
+      </section>
+    </main>
   );
 }
 

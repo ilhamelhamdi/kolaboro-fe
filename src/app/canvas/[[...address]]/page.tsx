@@ -5,6 +5,7 @@ import {
   BaseStreamMessage,
   CanvasPageProps,
   DeleteNoteMessage,
+  EditCanvasMessage,
   EditNoteMessage,
   GetCanvasResponse,
   RefreshCanvasMessage,
@@ -27,13 +28,16 @@ import { Canvas } from "@/components/models/Canvas";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { getDeltaTime } from "@/components/utils/TimeUtils";
+import { Pencil } from "lucide-react";
+import CanvasFormModal from "./CanvasFormModal";
 
 function CanvasPage({ params }: CanvasPageProps) {
   const resolvedParams = React.use(params); // Unwrap the params Promise
   const [canvas, setCanvas] = useState<Canvas | null>(null);
   const [notes, dispatchNotes] = useReducer(notesReducer, []);
   const [activeNote, setActiveNote] = useState<Note | null>(null);
-  const [isFormModalOpen, setFormModalOpen] = useState(false);
+  const [isNoteFormOpen, setNoteFormOpen] = useState(false);
+  const [isCanvasFormOpen, setCanvasFormOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const { getAccessToken, user } = useAuth();
@@ -50,6 +54,7 @@ function CanvasPage({ params }: CanvasPageProps) {
         Authorization: `Bearer ${getAccessToken()}`,
       },
     });
+
     if (response.ok) {
       const jsonResponse: GetCanvasResponse = await response.json();
       setCanvas(jsonResponse.data);
@@ -63,6 +68,9 @@ function CanvasPage({ params }: CanvasPageProps) {
     switch (message.event) {
       case "refresh_canvas":
         setCanvas((message as RefreshCanvasMessage).message);
+        break;
+      case "edit_canvas":
+        setCanvas((message as EditCanvasMessage).message);
         break;
       case REFRESH_NOTES:
         dispatchNotes({ type: REFRESH_NOTES, payload: (message as RefreshNoteMessage).message });
@@ -110,6 +118,14 @@ function CanvasPage({ params }: CanvasPageProps) {
     fetchCanvas();
     handleRealtimeStream();
   }, []);
+
+  useEffect(() => {
+    // Change the address in the browser URL whenever the canvas changes
+    if (canvas) {
+      const address = canvas.address;
+      history.replaceState({}, "", `/canvas/${address}`);
+    }
+  }, [canvas]);
 
   if (isLoading) {
     return (
@@ -161,11 +177,20 @@ function CanvasPage({ params }: CanvasPageProps) {
           Kolaboro
         </Link>
         <div className="ml-20 flex flex-col">
-          <div className="flex justify-between text-sm">
+          <div className="flex justify-between text-sm gap-4 min-w-[200px]">
             <span>{canvas.owner.displayName}</span>
-            <span>{getDeltaTime(canvas.createdAt)}</span>
+            <span>{getDeltaTime(canvas.created_at)}</span>
           </div>
-          <h1 className="font-semibold text-3xl">{canvas.title}</h1>
+          <div className="flex justify-between gapy-4">
+            <h1 className="font-semibold text-3xl">{canvas.title}</h1>
+            <Button
+              variant={"ghost"}
+              onClick={() => setCanvasFormOpen(true)}
+              className="hover:bg-black/10"
+            >
+              <Pencil />
+            </Button>
+          </div>
         </div>
       </div>
       <div id="canvas-space" className="relative w-full h-full grow">
@@ -176,7 +201,7 @@ function CanvasPage({ params }: CanvasPageProps) {
             isEditable={canvas.owner.id === user.id || note.authorId === user.id} // Only allow editing if user is the owner of the canvas or the author of the note
             onEdit={(n) => {
               setActiveNote(n);
-              setFormModalOpen(true);
+              setNoteFormOpen(true);
             }}
           />
         ))}
@@ -184,18 +209,20 @@ function CanvasPage({ params }: CanvasPageProps) {
 
       <AddNoteButton
         onClick={() => {
-          setFormModalOpen(true);
+          setNoteFormOpen(true);
         }}
       />
 
-      {isFormModalOpen && (
+      {isNoteFormOpen && (
         <NoteModalForm
-          setModalOpen={setFormModalOpen}
+          setModalOpen={setNoteFormOpen}
           canvasId={getCanvasId()}
           currentNote={activeNote}
           clearCurrentNote={() => setActiveNote(null)}
         />
       )}
+
+      {isCanvasFormOpen && <CanvasFormModal canvas={canvas} setModalOpen={setCanvasFormOpen} />}
     </main>
   );
 }

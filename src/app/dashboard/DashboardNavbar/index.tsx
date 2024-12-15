@@ -14,7 +14,11 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/components/context/AuthContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-function Navbar() {
+interface DashboardNavbarProps {
+  onCreateCanvas: () => void;
+}
+
+const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ onCreateCanvas }) => {
   const { user, logout } = useAuth();
   return (
     <header className="px-10 py-4 border-b flex justify-between">
@@ -33,11 +37,11 @@ function Navbar() {
             </Link>
           </NavigationMenuItem>
           <NavigationMenuItem>
-            <Link href="/" legacyBehavior passHref>
+            <button onClick={onCreateCanvas}>
               <NavigationMenuLink className={navigationMenuTriggerStyle() + " text-lg"}>
                 Make+
               </NavigationMenuLink>
-            </Link>
+            </button>
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>
@@ -61,6 +65,6 @@ function Navbar() {
       </div>
     </header>
   );
-}
+};
 
-export default Navbar;
+export default DashboardNavbar;
